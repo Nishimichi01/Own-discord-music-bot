@@ -32,9 +32,10 @@ class MusicBot(commands.Bot):
             'default_search': 'auto',
             'noplaylist': True,  # Don't extract playlists, just single videos
             'nocheckcertificate': True,  # Bypass SSL certificate checks
+            'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',  # Fake browser user agent
             'extractor_args': {
                 'youtube': {
-                    'player_client': 'android',  # Use mobile client to avoid bot detection
+                    'player_client': ['ios', 'web'],  # Try multiple clients
                 }
             }
         }
