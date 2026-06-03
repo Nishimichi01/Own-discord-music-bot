@@ -63,10 +63,16 @@ class MusicBot(commands.Bot):
             is_url = query.startswith('http') and ('youtube.com' in query or 'youtu.be' in query)
 
             if is_url:
-                # Direct URL - extract info directly
+                # Convert YouTube URL to Invidious (bypasses bot detection)
+                if 'youtube.com/watch?v=' in query:
+                    video_id = query.split('v=')[1].split('&')[0]
+                    query = f'https://yewtu.be/watch?v={video_id}'
+                elif 'youtu.be/' in query:
+                    video_id = query.split('youtu.be/')[1].split('?')[0]
+                    query = f'https://yewtu.be/watch?v={video_id}'
+
                 info = ydl.extract_info(query, download=False)
                 if info:
-                    # Use webpage_url for the YouTube URL (what we need for playback)
                     youtube_url = info.get('webpage_url') or query
                     return {
                         'title': info.get('title', 'Unknown'),
@@ -78,7 +84,6 @@ class MusicBot(commands.Bot):
                 info = ydl.extract_info(f"ytsearch:{query}", download=False)
                 if 'entries' in info and len(info['entries']) > 0:
                     result = info['entries'][0]
-                    # Use webpage_url for the YouTube URL
                     youtube_url = result.get('webpage_url') or result.get('url')
                     return {
                         'title': result['title'],
