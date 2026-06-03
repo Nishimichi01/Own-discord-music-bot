@@ -30,7 +30,13 @@ class MusicBot(commands.Bot):
             'quiet': True,
             'no_warnings': True,
             'default_search': 'auto',
-            'noplaylist': True  # Don't extract playlists, just single videos
+            'noplaylist': True,  # Don't extract playlists, just single videos
+            'nocheckcertificate': True,  # Bypass SSL certificate checks
+            'extractor_args': {
+                'youtube': {
+                    'player_client': 'android',  # Use mobile client to avoid bot detection
+                }
+            }
         }
 
         # FFmpeg options
