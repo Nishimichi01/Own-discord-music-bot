@@ -3,3 +3,4 @@ python-dotenv
 yt-dlp>=2023.3.4
 PyNaCl
 davey
+spotipy
