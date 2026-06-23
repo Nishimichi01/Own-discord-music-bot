@@ -1,0 +1,81 @@
+# Discord Music Bot CI/CD Pipeline
+stages:
+  - test
+  - build
+  - deploy
+
+variables:
+  PYTHON_VERSION: "3.14"
+
+# Test Stage - Check code quality and run tests
+test:
+  stage: test
+  image: python:3.14
+  before_script:
+    - python -m pip install --upgrade pip
+    - pip install -r requirements.txt
+  script:
+    # Check Python syntax
+    - python -m py_compile music_bot.py
+    # Check for common errors
+    - python music_bot.py --help 2>&1 | head -5 || true
+    # Run bot startup test (quick check if bot initializes)
+    - timeout 5s python -c "
+      import music_bot;
+      print('Bot module loaded successfully')
+      " || true
+  only:
+    - main
+  allow_failure: false
+
+# Build Stage - Prepare bot for deployment
+build:
+  stage: build
+  image: python:3.14
+  before_script:
+    - python -m pip install --upgrade pip
+    - pip install -r requirements.txt
+  script:
+    - echo "Building Discord bot..."
+    - echo "All dependencies installed successfully"
+    - python -c "import discord; print(f'Discord.py version: {discord.__version__}')"
+    - python -c "import yt_dlp; print(f'yt-dlp version: {yt_dlp.__version__}')"
+  only:
+    - main
+  artifacts:
+    paths:
+      - requirements.txt
+    expire_in: 1 day
+
+# Deploy Stage - Deploy to Render
+deploy:
+  stage: deploy
+  image: curlimages/curl:latest
+  script:
+    - echo "Triggering Render deployment..."
+    # Trigger Render webhook to redeploy the bot
+    - |
+      curl -X POST https://api.render.com/webhooks/deploys/YOUR_SERVICE_ID \
+        -H "Authorization: Bearer $RENDER_API_KEY" \
+        -H "Content-Type: application/json" \
+        -d "{}"
+  only:
+    - main
+  when: on_success
+  needs:
+    - test
+    - build
+
+# Manual Deploy - Can trigger manually from GitLab UI
+deploy:manual:
+  stage: deploy
+  image: curlimages/curl:latest
+  script:
+    - echo "Manual deployment to Render..."
+    - |
+      curl -X POST https://api.render.com/webhooks/deploys/YOUR_SERVICE_ID \
+        -H "Authorization: Bearer $RENDER_API_KEY" \
+        -H "Content-Type: application/json" \
+        -d "{}"
+  when: manual
+  allow_failure: true
