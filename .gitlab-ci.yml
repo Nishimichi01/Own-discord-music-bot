@@ -55,7 +55,7 @@ deploy:
     - echo "Triggering Render deployment..."
     # Trigger Render webhook to redeploy the bot
     - |
-      curl -X POST https://api.render.com/webhooks/deploys/YOUR_SERVICE_ID \
+      curl -X POST https://api.render.com/webhooks/deploys/srv-d8fsbqv40ujc73bdaem0 \
         -H "Authorization: Bearer $RENDER_API_KEY" \
         -H "Content-Type: application/json" \
         -d "{}"
@@ -73,7 +73,7 @@ deploy:manual:
   script:
     - echo "Manual deployment to Render..."
     - |
-      curl -X POST https://api.render.com/webhooks/deploys/YOUR_SERVICE_ID \
+      curl -X POST https://api.render.com/webhooks/deploys/srv-d8fsbqv40ujc73bdaem0 \
         -H "Authorization: Bearer $RENDER_API_KEY" \
         -H "Content-Type: application/json" \
         -d "{}"
